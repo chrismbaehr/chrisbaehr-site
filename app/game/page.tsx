@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { Fraunces, Instrument_Sans } from "next/font/google";
+import { Press_Start_2P, VT323 } from "next/font/google";
 import Link from "next/link";
 import styles from "./game.module.css";
 import { applyKeyState, clearPointer, createInputState, requestCut, setPointer } from "@/lib/game/input";
@@ -17,16 +17,16 @@ import {
 } from "@/lib/game/state";
 import type { GameState, GameViewport, HudMessage, Phase } from "@/lib/game/types";
 
-const instrumentSans = Instrument_Sans({
+const pixelBody = VT323({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-instrument-sans",
+  weight: ["400"],
+  variable: "--font-vt323",
 });
 
-const fraunces = Fraunces({
+const pixelDisplay = Press_Start_2P({
   subsets: ["latin"],
-  weight: ["500", "600"],
-  variable: "--font-fraunces",
+  weight: ["400"],
+  variable: "--font-press-start-2p",
 });
 
 interface HudState {
@@ -224,6 +224,7 @@ export default function GamePage() {
         canvas.style.height = `${viewport.height}px`;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
+      ctx.imageSmoothingEnabled = false;
 
       const deltaMs = lastFrameMs === 0 ? 16 : Math.min(42, nowMs - lastFrameMs);
       lastFrameMs = nowMs;
@@ -293,8 +294,9 @@ export default function GamePage() {
   }, [hud.message]);
 
   return (
-    <div className={`${styles.page} ${instrumentSans.variable} ${fraunces.variable}`}>
+    <div className={`${styles.page} ${pixelBody.variable} ${pixelDisplay.variable}`}>
       <a className={styles.skipLink} href="#main">Skip to content</a>
+      <p className={styles.wipCorner} role="status" aria-live="polite">WORK IN PROGRESS</p>
 
       <header className={styles.header} aria-label="Primary">
         <nav className={styles.navWrap}>
