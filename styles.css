@@ -146,6 +146,13 @@ main {
   color: var(--forest-soft);
 }
 
+.credibility-line {
+  margin: -0.4rem 0 0.95rem;
+  font-size: 0.83rem;
+  color: var(--forest-soft);
+  letter-spacing: 0.015em;
+}
+
 h1,
 h2,
 h3 {
@@ -459,8 +466,8 @@ button:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .research-layout .research-card:last-child {
-    grid-column: 1 / -1;
+  .research-layout.research-layout--single {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
