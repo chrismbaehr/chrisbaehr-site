@@ -21,6 +21,21 @@ npm run dev
 - `http://localhost:3000/` (redirects to `index.html`)
 - `http://localhost:3000/game` (CRISPR targeting mini-game)
 
+## Optimize Fun Gallery Images
+
+Generate lightweight gallery derivatives (metadata-stripped) for fast load:
+
+```bash
+npm run optimize:gallery
+```
+
+This creates:
+
+- `assets/gallery/thumbs/` and `public/assets/gallery/thumbs/` for grid thumbnails
+- `assets/gallery/full/` and `public/assets/gallery/full/` for lightbox/full-size views
+
+The generator exports both `avif` and `webp` versions and strips EXIF/metadata by default.
+
 ## Game overview
 
 `/game` is a single-page HTML5 Canvas mini-game where the player moves a Cas enzyme over scrolling DNA sites and cuts based on guide RNA matching plus PAM (`NGG`) availability. Perfect guide+PAM cuts score highest, near matches flag off-target risk, and invalid/no-PAM cuts are penalized. The game includes three timed rounds, keyboard and touch controls, a reduced-motion toggle, deterministic seed input for debugging, and science notes describing biological simplifications.

@@ -59,7 +59,10 @@
     figure.className = "photo-card";
 
     const img = document.createElement("img");
-    img.src = item.src;
+    img.src = item.thumbSrc;
+    if (item.fullSrc) {
+      img.dataset.fullSrc = item.fullSrc;
+    }
     img.alt = `Adventure photo ${item.id}`;
     img.loading = idx < 2 ? "eager" : "lazy";
     img.decoding = "async";
@@ -84,6 +87,7 @@
 
     const section = document.getElementById("adventure-gallery-section");
     const prefix = grid.dataset.prefix || "adventure-";
+    const fullPrefix = grid.dataset.fullPrefix || prefix.replace("/thumbs/", "/full/");
     const max = Number.parseInt(grid.dataset.max || "30", 10);
     const initialCount = Number.parseInt(grid.dataset.initial || "4", 10);
     const batchCount = Number.parseInt(grid.dataset.batch || "6", 10);
@@ -125,8 +129,8 @@
 
     const addResults = (results) => {
       const nextItems = results
-        .filter((item) => item && item.src && !loadedIds.has(item.id))
-        .map((item) => ({ id: item.id, src: item.src }));
+        .filter((item) => item && item.thumbSrc && !loadedIds.has(item.id))
+        .map((item) => ({ id: item.id, thumbSrc: item.thumbSrc, fullSrc: item.fullSrc }));
 
       if (!nextItems.length) {
         return;
@@ -148,8 +152,20 @@
 
       for (let i = start; i < endExclusive; i += 1) {
         const id = String(i).padStart(2, "0");
-        const paths = extensions.map((ext) => `./assets/${prefix}${id}.${ext}`);
-        tasks.push(loadFirstAvailableImage(paths).then((src) => ({ id, src })));
+        const thumbPaths = extensions.map((ext) => `./assets/${prefix}${id}.${ext}`);
+        tasks.push(
+          loadFirstAvailableImage(thumbPaths).then((thumbSrc) => {
+            if (!thumbSrc) {
+              return { id, thumbSrc: null, fullSrc: null };
+            }
+
+            const extMatch = thumbSrc.match(/\.([a-z0-9]+)$/i);
+            const ext = extMatch ? extMatch[1] : extensions[0];
+            const fullSrc = `./assets/${fullPrefix}${id}.${ext}`;
+
+            return { id, thumbSrc, fullSrc };
+          })
+        );
       }
 
       return Promise.all(tasks).then(addResults);
@@ -289,7 +305,13 @@
       }
 
       lastFocused = document.activeElement;
-      lightboxImage.src = img.currentSrc || img.src;
+      const fallbackSrc = img.currentSrc || img.src;
+      const preferredSrc = img.dataset.fullSrc || fallbackSrc;
+      lightboxImage.onerror = () => {
+        lightboxImage.onerror = null;
+        lightboxImage.src = fallbackSrc;
+      };
+      lightboxImage.src = preferredSrc;
       lightboxImage.alt = img.alt || "Expanded adventure photo";
       lightbox.hidden = false;
       document.body.classList.add("lightbox-open");
