@@ -85,13 +85,22 @@
     const section = document.getElementById("adventure-gallery-section");
     const prefix = grid.dataset.prefix || "adventure-";
     const max = Number.parseInt(grid.dataset.max || "30", 10);
+    const initialCount = Number.parseInt(grid.dataset.initial || "4", 10);
+    const batchCount = Number.parseInt(grid.dataset.batch || "6", 10);
+    const dwellMs = Number.parseInt(grid.dataset.dwellMs || "4200", 10);
     const extensions = (grid.dataset.exts || "jpg,jpeg,png,webp,avif")
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean);
 
     let foundItems = [];
+    const loadedIds = new Set();
     let resizeFrame = 0;
+    let nextIdToProbe = 1;
+    let progressiveTimer = 0;
+    let initialLoadDone = false;
+    let gallerySeen = false;
+    let progressiveLoading = false;
 
     const renderGallery = () => {
       if (!foundItems.length) {
@@ -114,29 +123,112 @@
       grid.replaceChildren(...columnNodes);
     };
 
-    const tasks = [];
-    for (let i = 1; i <= max; i += 1) {
-      const id = String(i).padStart(2, "0");
-      const paths = extensions.map((ext) => `./assets/${prefix}${id}.${ext}`);
-      tasks.push(
-        loadFirstAvailableImage(paths).then((src) => ({ id, src }))
-      );
-    }
+    const addResults = (results) => {
+      const nextItems = results
+        .filter((item) => item && item.src && !loadedIds.has(item.id))
+        .map((item) => ({ id: item.id, src: item.src }));
 
-    Promise.all(tasks).then((results) => {
-      foundItems = results.filter((item) => item.src);
-
-      if (foundItems.length === 0) {
-        if (section) {
-          section.hidden = true;
-        }
+      if (!nextItems.length) {
         return;
       }
+
+      nextItems.forEach((item) => loadedIds.add(item.id));
+      foundItems = foundItems.concat(nextItems);
+      foundItems.sort((a, b) => Number.parseInt(a.id, 10) - Number.parseInt(b.id, 10));
 
       if (section) {
         section.hidden = false;
       }
       renderGallery();
+    };
+
+    const probeRange = (start, count) => {
+      const tasks = [];
+      const endExclusive = Math.min(max + 1, start + count);
+
+      for (let i = start; i < endExclusive; i += 1) {
+        const id = String(i).padStart(2, "0");
+        const paths = extensions.map((ext) => `./assets/${prefix}${id}.${ext}`);
+        tasks.push(loadFirstAvailableImage(paths).then((src) => ({ id, src })));
+      }
+
+      return Promise.all(tasks).then(addResults);
+    };
+
+    const maybeHideEmptySection = () => {
+      if (section && foundItems.length === 0 && nextIdToProbe > max) {
+        section.hidden = true;
+      }
+    };
+
+    const scheduleProgressiveLoad = (delayMs) => {
+      if (!initialLoadDone || !gallerySeen || document.hidden) {
+        return;
+      }
+      if (nextIdToProbe > max || progressiveLoading || progressiveTimer) {
+        return;
+      }
+
+      progressiveTimer = window.setTimeout(() => {
+        progressiveTimer = 0;
+        const start = nextIdToProbe;
+        const count = Math.min(batchCount, max - start + 1);
+        if (count <= 0) {
+          maybeHideEmptySection();
+          return;
+        }
+
+        nextIdToProbe += count;
+        progressiveLoading = true;
+        probeRange(start, count)
+          .finally(() => {
+            progressiveLoading = false;
+            maybeHideEmptySection();
+            scheduleProgressiveLoad(1100);
+          });
+      }, delayMs);
+    };
+
+    const isSectionInView = () => {
+      if (!section) {
+        return true;
+      }
+      const rect = section.getBoundingClientRect();
+      return rect.top < window.innerHeight * 1.15 && rect.bottom > 0;
+    };
+
+    gallerySeen = isSectionInView();
+
+    if (section && "IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) {
+            gallerySeen = true;
+            scheduleProgressiveLoad(900);
+          }
+        },
+        { threshold: 0.15 }
+      );
+      observer.observe(section);
+    }
+
+    const firstBatch = Math.min(initialCount, max);
+    nextIdToProbe = firstBatch + 1;
+    probeRange(1, firstBatch).finally(() => {
+      initialLoadDone = true;
+      maybeHideEmptySection();
+      scheduleProgressiveLoad(dwellMs);
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        if (progressiveTimer) {
+          window.clearTimeout(progressiveTimer);
+          progressiveTimer = 0;
+        }
+        return;
+      }
+      scheduleProgressiveLoad(800);
     });
 
     window.addEventListener("resize", () => {
