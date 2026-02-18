@@ -25,7 +25,7 @@ const spriteStatusMap: Record<SpriteKind, SpriteStatus> = {
   click: "idle",
 };
 
-const spriteMap: Record<SpriteKind, HTMLImageElement | null> = {
+const spriteMap: Record<SpriteKind, HTMLCanvasElement | null> = {
   default: null,
   click: null,
 };
@@ -33,6 +33,88 @@ const spriteMap: Record<SpriteKind, HTMLImageElement | null> = {
 const spriteIndexMap: Record<SpriteKind, number> = {
   default: 0,
   click: 0,
+};
+
+const sanitizeSpriteImage = (image: HTMLImageElement): HTMLCanvasElement => {
+  const source = document.createElement("canvas");
+  source.width = image.naturalWidth || image.width;
+  source.height = image.naturalHeight || image.height;
+  const sourceCtx = source.getContext("2d");
+  if (!sourceCtx) {
+    return source;
+  }
+
+  sourceCtx.drawImage(image, 0, 0);
+  const imageData = sourceCtx.getImageData(0, 0, source.width, source.height);
+  const data = imageData.data;
+
+  const isCheckerPixel = (r: number, g: number, b: number): boolean => {
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const spread = max - min;
+    // Transparent-grid backgrounds tend to be near-neutral grays.
+    return spread <= 14 && max >= 85 && min <= 238;
+  };
+
+  for (let idx = 0; idx < data.length; idx += 4) {
+    const alpha = data[idx + 3];
+    if (alpha === 0) {
+      continue;
+    }
+
+    const r = data[idx];
+    const g = data[idx + 1];
+    const b = data[idx + 2];
+
+    if (isCheckerPixel(r, g, b)) {
+      data[idx + 3] = 0;
+    }
+  }
+
+  sourceCtx.putImageData(imageData, 0, 0);
+
+  const cleanedData = sourceCtx.getImageData(0, 0, source.width, source.height).data;
+  let minX = source.width;
+  let minY = source.height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < source.height; y += 1) {
+    for (let x = 0; x < source.width; x += 1) {
+      const idx = (y * source.width + x) * 4 + 3;
+      if (cleanedData[idx] > 10) {
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+
+  if (maxX < minX || maxY < minY) {
+    return source;
+  }
+
+  const cropped = document.createElement("canvas");
+  cropped.width = maxX - minX + 1;
+  cropped.height = maxY - minY + 1;
+  const croppedCtx = cropped.getContext("2d");
+  if (!croppedCtx) {
+    return source;
+  }
+  croppedCtx.drawImage(
+    source,
+    minX,
+    minY,
+    cropped.width,
+    cropped.height,
+    0,
+    0,
+    cropped.width,
+    cropped.height,
+  );
+
+  return cropped;
 };
 
 const loadSpriteCandidate = (kind: SpriteKind): void => {
@@ -49,7 +131,7 @@ const loadSpriteCandidate = (kind: SpriteKind): void => {
   const src = SPRITE_CANDIDATES[kind][spriteIndexMap[kind]];
   spriteStatusMap[kind] = "loading";
   next.onload = () => {
-    spriteMap[kind] = next;
+    spriteMap[kind] = sanitizeSpriteImage(next);
     spriteStatusMap[kind] = "ready";
   };
   next.onerror = () => {
@@ -59,7 +141,7 @@ const loadSpriteCandidate = (kind: SpriteKind): void => {
   next.src = src;
 };
 
-const getLoadedSprite = (kind: SpriteKind): HTMLImageElement | null => {
+const getLoadedSprite = (kind: SpriteKind): HTMLCanvasElement | null => {
   if (spriteStatusMap[kind] === "ready" && spriteMap[kind]) {
     return spriteMap[kind];
   }
