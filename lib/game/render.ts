@@ -4,6 +4,71 @@ interface RenderOpts {
   nowMs: number;
 }
 
+type SpriteStatus = "idle" | "loading" | "ready" | "error";
+
+type SpriteKind = "default" | "click";
+
+const SPRITE_CANDIDATES: Record<SpriteKind, readonly string[]> = {
+  default: [
+    "/assets/cas9-sprite.png",
+    "/assets/cas9-cursor.png",
+    "/assets/cas9-sprite.webp",
+  ],
+  click: [
+    "/assets/cas9-sprite-click.png",
+    "/assets/cas9-cursor-click.png",
+  ],
+};
+
+const spriteStatusMap: Record<SpriteKind, SpriteStatus> = {
+  default: "idle",
+  click: "idle",
+};
+
+const spriteMap: Record<SpriteKind, HTMLImageElement | null> = {
+  default: null,
+  click: null,
+};
+
+const spriteIndexMap: Record<SpriteKind, number> = {
+  default: 0,
+  click: 0,
+};
+
+const loadSpriteCandidate = (kind: SpriteKind): void => {
+  if (typeof window === "undefined") {
+    return;
+  }
+  if (spriteIndexMap[kind] >= SPRITE_CANDIDATES[kind].length) {
+    spriteStatusMap[kind] = "error";
+    spriteMap[kind] = null;
+    return;
+  }
+
+  const next = new window.Image();
+  const src = SPRITE_CANDIDATES[kind][spriteIndexMap[kind]];
+  spriteStatusMap[kind] = "loading";
+  next.onload = () => {
+    spriteMap[kind] = next;
+    spriteStatusMap[kind] = "ready";
+  };
+  next.onerror = () => {
+    spriteIndexMap[kind] += 1;
+    loadSpriteCandidate(kind);
+  };
+  next.src = src;
+};
+
+const getLoadedSprite = (kind: SpriteKind): HTMLImageElement | null => {
+  if (spriteStatusMap[kind] === "ready" && spriteMap[kind]) {
+    return spriteMap[kind];
+  }
+  if (spriteStatusMap[kind] === "idle") {
+    loadSpriteCandidate(kind);
+  }
+  return null;
+};
+
 const drawPanel = (
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -124,27 +189,44 @@ const drawEnzyme = (
   const y = Math.floor(state.enzymeY);
   const size = radius * 2;
 
-  if (!state.reducedMotion && nowMs - state.lastCutMs < 220) {
+  const clickWindowActive = nowMs - state.lastCutMs < 170;
+
+  if (!state.reducedMotion && clickWindowActive) {
     const fade = 1 - (nowMs - state.lastCutMs) / 220;
     const color = outcomeColor(state.lastCutOutcome);
     ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${0.35 * fade})`;
     ctx.fillRect(x - radius - 10, y - radius - 10, size + 20, size + 20);
   }
 
-  drawPanel(ctx, x - radius, y - radius, size, size, "#193250", "#58c4ff");
+  const loadedSprite =
+    (clickWindowActive ? getLoadedSprite("click") : null) ??
+    getLoadedSprite("default");
+  if (loadedSprite) {
+    const spriteSize = Math.max(56, radius * 3);
+    const spriteX = Math.floor(x - spriteSize * 0.5);
+    const spriteY = Math.floor(y - spriteSize * 0.5);
 
-  ctx.fillStyle = "#34f4cf";
-  ctx.fillRect(x - 2, y - radius - 8, 4, 6);
-  ctx.fillRect(x - 2, y + radius + 2, 4, 6);
-  ctx.fillRect(x - radius - 8, y - 2, 6, 4);
-  ctx.fillRect(x + radius + 2, y - 2, 6, 4);
+    ctx.drawImage(loadedSprite, spriteX, spriteY, spriteSize, spriteSize);
 
-  ctx.fillStyle = "#effbff";
-  ctx.font = "bold 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("CAS", x, y);
-  ctx.textAlign = "start";
+    ctx.strokeStyle = "#34f4cf";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(spriteX - 4, spriteY - 4, spriteSize + 8, spriteSize + 8);
+  } else {
+    drawPanel(ctx, x - radius, y - radius, size, size, "#193250", "#58c4ff");
+
+    ctx.fillStyle = "#34f4cf";
+    ctx.fillRect(x - 2, y - radius - 8, 4, 6);
+    ctx.fillRect(x - 2, y + radius + 2, 4, 6);
+    ctx.fillRect(x - radius - 8, y - 2, 6, 4);
+    ctx.fillRect(x + radius + 2, y - 2, 6, 4);
+
+    ctx.fillStyle = "#effbff";
+    ctx.font = "bold 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("CAS", x, y);
+    ctx.textAlign = "start";
+  }
 
   ctx.strokeStyle = "rgba(52, 244, 207, 0.32)";
   ctx.lineWidth = 1;
