@@ -1,0 +1,411 @@
+.page {
+  --paper: #f6f4ee;
+  --paper-strong: #efece3;
+  --forest: #1f3b2f;
+  --forest-soft: #2f5445;
+  --line: #d7d2c5;
+  --button: #244738;
+  --button-hover: #1d3a2e;
+  --focus: #8ba37a;
+  --card: rgba(255, 255, 255, 0.62);
+  --shadow: rgba(25, 41, 33, 0.08);
+  min-height: 100svh;
+  font-family: var(--font-instrument-sans), "Segoe UI", sans-serif;
+  color: var(--forest);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(246, 244, 238, 0.94)),
+    url("/assets/topo-texture.svg");
+  background-size: cover, 700px;
+  background-attachment: fixed, fixed;
+}
+
+.page * {
+  box-sizing: border-box;
+}
+
+.skipLink {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  background: var(--button);
+  color: #fff;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.4rem;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skipLink:focus-visible {
+  top: 0.75rem;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(246, 244, 238, 0.94);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(4px);
+}
+
+.navWrap {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--forest);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.brandIcon {
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: var(--forest-soft);
+}
+
+.brandMark {
+  font-family: var(--font-fraunces), Georgia, serif;
+  letter-spacing: 0.04em;
+}
+
+.navLinks {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem 0.9rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navLinks a {
+  color: var(--forest-soft);
+  text-decoration: none;
+  font-size: 0.88rem;
+}
+
+.navLinks a[aria-current="page"] {
+  color: var(--forest);
+  font-weight: 600;
+}
+
+.main {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 0 1rem 2.5rem;
+}
+
+.hero {
+  padding: 5.25rem 0 1.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.85rem;
+  font-size: 0.96rem;
+  color: var(--forest-soft);
+}
+
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  line-height: 1.2;
+  font-size: clamp(1.72rem, 6vw, 2.55rem);
+  max-width: 20ch;
+}
+
+.heroLead {
+  margin: 0.9rem 0 0;
+  max-width: 66ch;
+}
+
+.controls {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.seedControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.4rem 0.35rem 0.7rem;
+}
+
+.seedControl label {
+  font-size: 0.82rem;
+  color: var(--forest-soft);
+}
+
+.seedControl input {
+  width: 8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.62rem;
+  font-size: 0.88rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--forest);
+}
+
+.toggleGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggleButton {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--forest);
+  padding: 0.52rem 0.8rem;
+  font-size: 0.83rem;
+  cursor: pointer;
+}
+
+.toggleButton[aria-pressed="true"] {
+  border-color: #2f5445;
+  background: rgba(47, 84, 69, 0.14);
+}
+
+.button {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 0.58rem 0.95rem;
+  min-height: 2.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--button);
+  color: #fff;
+}
+
+.button:hover {
+  background: var(--button-hover);
+}
+
+.buttonSecondary {
+  border-color: var(--line);
+  color: var(--forest);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.buttonSecondary:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.gameShell {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: 0 18px 28px -22px var(--shadow);
+  background: rgba(255, 255, 255, 0.66);
+  overflow: hidden;
+}
+
+.hudTop {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  padding: 0.9rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.hudChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.35rem 0.62rem;
+  font-size: 0.82rem;
+  color: var(--forest-soft);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.hudValue {
+  color: var(--forest);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.canvasWrap {
+  position: relative;
+}
+
+.canvas {
+  width: 100%;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(239, 236, 227, 0.28));
+}
+
+.hudBottom {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.72rem 0.9rem;
+  border-top: 1px solid var(--line);
+  min-height: 3.1rem;
+}
+
+.message {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--forest-soft);
+}
+
+.messageGood {
+  color: #25513d;
+}
+
+.messageWarn {
+  color: #6f5a1f;
+}
+
+.messageBad {
+  color: #7e4334;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(22, 35, 29, 0.66);
+  color: #fff;
+  padding: 1rem;
+  display: grid;
+  place-content: center;
+}
+
+.overlayCard {
+  width: min(92vw, 34rem);
+  border-radius: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(19, 31, 25, 0.82);
+  padding: 1rem;
+  box-shadow: 0 18px 24px -20px rgba(0, 0, 0, 0.5);
+}
+
+.overlayCard h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(1.2rem, 4vw, 1.7rem);
+}
+
+.overlayCard p {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.45;
+}
+
+.overlayCard p + p,
+.overlayCard ul,
+.overlayCard .overlayActions {
+  margin-top: 0.75rem;
+}
+
+.overlayCard ul {
+  padding-left: 1.15rem;
+}
+
+.overlayActions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.scienceNotes {
+  margin-top: 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: 0.95rem;
+  background: var(--card);
+  padding: 0.8rem 0.95rem;
+}
+
+.scienceNotes summary {
+  cursor: pointer;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.06rem;
+}
+
+.scienceNotes ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.15rem;
+}
+
+.scienceNotes li + li {
+  margin-top: 0.42rem;
+}
+
+.footer {
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 2.8rem 1rem 2rem;
+  color: var(--forest-soft);
+  font-size: 0.92rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  border-top: 1px solid var(--line);
+}
+
+:global(a:focus-visible),
+:global(button:focus-visible),
+:global(input:focus-visible),
+:global(summary:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (min-width: 48rem) {
+  .navWrap {
+    padding: 0.95rem 1rem;
+  }
+
+  .navLinks a {
+    font-size: 0.92rem;
+  }
+
+  .hero {
+    padding: 6.25rem 0 1.75rem;
+  }
+
+  .hudTop {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .hudBottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .seedControl input {
+    width: 6.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    scroll-behavior: auto;
+  }
+}

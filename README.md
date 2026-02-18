@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# chrisbaehr.com
 
-## Getting Started
+Personal website for Chris Baehr. The site is primarily static HTML/CSS/JS content served through a lightweight Next.js shell, with a canvas-based educational CRISPR mini-game at `/game`.
 
-First, run the development server:
+## Run locally
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Visit:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `http://localhost:3000/` (redirects to `index.html`)
+- `http://localhost:3000/game` (CRISPR targeting mini-game)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Game overview
 
-## Learn More
+`/game` is a single-page HTML5 Canvas mini-game where the player moves a Cas enzyme over scrolling DNA sites and cuts based on guide RNA matching plus PAM (`NGG`) availability. Perfect guide+PAM cuts score highest, near matches flag off-target risk, and invalid/no-PAM cuts are penalized. The game includes three timed rounds, keyboard and touch controls, a reduced-motion toggle, deterministic seed input for debugging, and science notes describing biological simplifications.
 
-To learn more about Next.js, take a look at the following resources:
+## Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `app/` - Next.js routes (`/` redirect and `/game` page)
+- `lib/game/` - game logic modules (state, generator, rendering, input, sequence helpers)
+- `public/` - static pages and assets used by the personal site
+- root `*.html`, `styles.css`, `script.js` - source copies for static pages mirrored to `public/`

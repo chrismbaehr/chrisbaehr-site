@@ -67,6 +67,11 @@
     img.setAttribute("role", "button");
     img.setAttribute("aria-label", `${img.alt}. Open full size image.`);
 
+    if (item.id === "02") {
+      img.dataset.secretGameHref = "./game.html";
+      img.setAttribute("aria-label", `${img.alt}. Open secret page.`);
+    }
+
     figure.appendChild(img);
     return figure;
   };
@@ -204,6 +209,11 @@
       if (!img || !grid.contains(img)) {
         return;
       }
+
+      if (img.dataset.secretGameHref) {
+        window.location.href = img.dataset.secretGameHref;
+        return;
+      }
       openLightbox(img);
     });
 
@@ -219,6 +229,12 @@
       }
 
       event.preventDefault();
+
+      if (img.dataset.secretGameHref) {
+        window.location.href = img.dataset.secretGameHref;
+        return;
+      }
+
       openLightbox(img);
     });
 

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Chris Baehr - PERCEPT for data-driven ligand design research direction.">
-  <title>PERCEPT for Data-Driven Ligand Design | Chris Baehr</title>
+  <meta name="description" content="Launch page for the Cas Chase CRISPR game.">
+  <title>Game | Chris Baehr</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -33,29 +33,34 @@
   </header>
 
   <main id="main" class="simple-page-main">
-    <section class="page-hero" aria-labelledby="direction-title">
-      <p class="eyebrow">Research Direction</p>
-      <h1 id="direction-title">PERCEPT for data-driven ligand design</h1>
-      <p class="page-lead">Modular, last-step targeting ligand attachment using reversible, traceless conjugation chemistry, built for iteration and matched comparisons in vivo.</p>
-    </section>
-
-    <section class="section research-layout research-layout--single" aria-label="PERCEPT details">
-      <article class="research-card">
-        <h2>Focus</h2>
-        <p>I build large pooled libraries of peptide-decorated CRISPR RNPs, screen them in vivo, and use the resulting datasets to train models that prioritize the next library design. The goal is an active learning loop for discovering ligands and formulations that improve tissue access and functional editing in vivo.</p>
-        <p><a class="button button-primary" href="mailto:cmbaehr@berkeley.edu">Discuss this direction</a></p>
-      </article>
+    <section class="page-hero" aria-labelledby="game-launch-title">
+      <p class="eyebrow">Mini-game</p>
+      <h1 id="game-launch-title">Opening Cas Chase</h1>
+      <p class="page-lead">If this page is served from your website or local dev server, it should forward to <code>/game</code> automatically.</p>
+      <p class="page-lead">If you opened this site directly as files (<code>file://</code>), run the Next app and open the game route manually.</p>
+      <div class="hero-cta">
+        <a class="button button-primary" href="http://localhost:3000/game">Open local game route</a>
+        <a class="button button-secondary" href="./index.html">Back to home</a>
+      </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <p>Chris Baehr</p>
-    <p class="last-updated">Last updated: 2026-02-17</p>
+    <p class="last-updated">Last updated: 2026-02-18</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script>
+    (function () {
+      var isWeb = window.location.protocol === "http:" || window.location.protocol === "https:";
+      if (!isWeb) {
+        return;
+      }
+      var target = new URL("/game", window.location.origin);
+      target.search = window.location.search;
+      target.hash = window.location.hash;
+      window.location.replace(target.toString());
+    })();
+  </script>
 </body>
 </html>
-
-
-
