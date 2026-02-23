@@ -83,21 +83,25 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--ink);
+  color: var(--accent);
   text-decoration: none;
 }
 
 .brandIcon {
   width: 1.55rem;
   height: 1.55rem;
-  fill: var(--accent);
+  display: block;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 0.22rem;
 }
 
 .brandMark {
-  font-family: var(--font-press-start-2p), monospace;
-  font-size: 0.74rem;
-  letter-spacing: 0.08em;
+  font-family: var(--font-vt323), monospace;
+  font-size: 1.18rem;
+  letter-spacing: 0.02em;
   color: var(--accent);
+  white-space: nowrap;
   text-shadow: 0 0 8px rgba(52, 244, 207, 0.4);
 }
 

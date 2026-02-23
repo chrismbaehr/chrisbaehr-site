@@ -301,10 +301,8 @@ export default function GamePage() {
       <header className={styles.header} aria-label="Primary">
         <nav className={styles.navWrap}>
           <Link className={styles.brand} href="/index.html#top" aria-label="Chris Baehr home">
-            <svg className={styles.brandIcon} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-              <path d="M16 3c-1.1 5.8-4.7 9.9-9.8 12.2 2.7.8 5.2.8 7.3.2-.8 2.5-2.2 4.6-4.4 6.6 4.9-.5 8.5-3.3 10.8-8.2 2.3 2.1 3.8 5.1 4.3 8.8 2.4-5.2 2.5-10.1.2-14.6C22.5 5.5 19.6 3.9 16 3Z" />
-            </svg>
-            <span className={styles.brandMark}>CB</span>
+            <img className={styles.brandIcon} src="/assets/brand-bear.png" alt="" aria-hidden="true" decoding="async" />
+            <span className={styles.brandMark}>Chris Baehr</span>
           </Link>
           <ul className={styles.navLinks}>
             <li><Link href="/index.html#work">My Work</Link></li>
